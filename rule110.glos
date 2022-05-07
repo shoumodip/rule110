@@ -1,32 +1,32 @@
 import std.io
+import std.linux
 
 const BOARD_CAP = 100
 let board bool[BOARD_CAP]
 
-let buffer char[BOARD_CAP]
-let output Str
-
 let main() {
     board[BOARD_CAP - 1] = true
 
-    output.data = buffer
-    output.size = BOARD_CAP
+    let output = io.File(linux.stdout)
 
-    for let i = 0; i < BOARD_CAP; i += 1 {
-        for let j = 0; j < BOARD_CAP; j += 1 {
+    for let i = 0, i < BOARD_CAP, i += 1 {
+        for let j = 0, j < BOARD_CAP, j += 1 {
             if board[j] {
-                buffer[j] = '*'
+                fprint(&output, '*')
             } else {
-                buffer[j] = ' '
+                fprint(&output, ' ')
             }
         }
 
-        print!(output, '\n')
+        fprint(&output, '\n')
+        io.flush(&output)
 
         let pattern = (board[0] as uint << 1) | board[1] as uint
-        for let j = 1; j < BOARD_CAP - 1; j += 1 {
+        for let j = 1, j < BOARD_CAP - 1, j += 1 {
             pattern = ((pattern << 1) & 7) | board[j + 1] as uint
             board[j] = ((110 >> pattern) & 1) as bool
         }
     }
+
+    io.close(&output)
 }
